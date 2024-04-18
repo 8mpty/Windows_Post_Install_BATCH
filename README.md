@@ -73,13 +73,13 @@ Default is ```irm post.8mpty.xyz | iex```,
 
 But if you want to pass in arguments:
 ```
-iex "&{$(irm post.8mpty.xyz)} 5"
+iex "&{$(irm 8mpty.com/post)} 5"
 ```
 Which will go to the [Extras] page.
 
 If running:
 ```
-iex "&{$(irm post.8mpty.xyz)} 5 6"
+iex "&{$(irm 8mpty.com/post)} 5 6"
 ```
 Will go the [Extras] page and execute option [6] which is creating the script shortcut.
 </p>
@@ -89,7 +89,7 @@ Will go the [Extras] page and execute option [6] which is creating the script sh
 
 ~~Ofcourse these options are not only limited to Options 5 & 6, other options are availble to try but do **NOTE** that only a max of "2" options are availble.~~
 
-~~As of right now, this script is not able to run further than "2" arguments like ```iex "&{$(irm post.8mpty.xyz)} 5 3 1"```.~~
+~~As of right now, this script is not able to run further than "2" arguments like ```iex "&{$(irm 8mpty.com/post)} 5 3 1"```.~~
 
 ~~Above is meant to go to the [Extras] Page and execute option [3] which is "Removal of Folders" and will execute [1] to confirm the removal but as of this current iteration of the script, it is **NOT POSSIBLE** yet.~~
 
@@ -97,7 +97,7 @@ The script is now able to run unlimited arguments as long as the arguments corre
 
 Fixed in Commits [986aa9a](https://github.com/8mpty/Windows_Post_Install_BATCH/commit/986aa9ab654410e7510039f2ac0ead36be0ef178#diff-4c4389ae3adbd3780d385439f1e161d08aade4df4cc5fd544c6ae4c0e45c7320) , [61aaf40](https://github.com/8mpty/Windows_Post_Install_BATCH/commit/61aaf4015acd8c20b287b41212bc69b5b1c57596) and [e0fb8c3](https://github.com/8mpty/Windows_Post_Install_BATCH/commit/e0fb8c31d21ad3345a0906292ee633af6f2b370a).
 
-EX. ```iex "&{$(irm post.8mpty.xyz)} 5 4 2 5 3 1 1 7 0"```
+EX. ```iex "&{$(irm 8mpty.com/post)} 5 4 2 5 3 1 1 7 0"```
 
 <details><summary>Explanation from left to right argumetns: (Click Me)</summary>
 <p>
