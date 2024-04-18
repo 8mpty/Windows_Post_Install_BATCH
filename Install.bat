@@ -1,61 +1,8 @@
 @echo off
+setlocal enabledelayedexpansion
 rem CenterSelf
 mode 67, 30
 
-CLS
- ECHO.
- ECHO =============================
- ECHO Running Admin shell
- ECHO =============================
-
-:init
- setlocal DisableDelayedExpansion
- set cmdInvoke=1
- set winSysFolder=System32
- set "batchPath=%~dpnx0"
- rem this works also from cmd shell, other than %~0
- for %%k in (%0) do set batchName=%%~nk
- set "vbsGetPrivileges=%temp%\OEgetPriv_%batchName%.vbs"
- setlocal EnableDelayedExpansion
-
-:checkPrivileges
-  NET FILE 1>NUL 2>NUL
-  if '%errorlevel%' == '0' ( goto gotPrivileges ) else ( goto getPrivileges )
-
-:getPrivileges
-  if '%1'=='ELEV' (echo ELEV & shift /1 & goto gotPrivileges)
-  ECHO.
-  ECHO **************************************
-  ECHO Invoking UAC for Privilege Escalation
-  ECHO **************************************
-
-  ECHO Set UAC = CreateObject^("Shell.Application"^) > "%vbsGetPrivileges%"
-  ECHO args = "ELEV " >> "%vbsGetPrivileges%"
-  ECHO For Each strArg in WScript.Arguments >> "%vbsGetPrivileges%"
-  ECHO args = args ^& strArg ^& " "  >> "%vbsGetPrivileges%"
-  ECHO Next >> "%vbsGetPrivileges%"
-  
-  if '%cmdInvoke%'=='1' goto InvokeCmd 
-
-  ECHO UAC.ShellExecute "!batchPath!", args, "", "runas", 1 >> "%vbsGetPrivileges%"
-  goto ExecElevation
-
-:InvokeCmd
-  ECHO args = "/c """ + "!batchPath!" + """ " + args >> "%vbsGetPrivileges%"
-  ECHO UAC.ShellExecute "%SystemRoot%\%winSysFolder%\cmd.exe", args, "", "runas", 1 >> "%vbsGetPrivileges%"
-
-:ExecElevation
- "%SystemRoot%\%winSysFolder%\WScript.exe" "%vbsGetPrivileges%" %*
- exit /B
-
-:gotPrivileges
- setlocal & cd /d %~dp0
- if '%1'=='ELEV' (del "%vbsGetPrivileges%" 1>nul 2>nul  &  shift /1)
-
- ::::::::::::::::::::::::::::
- ::START
- ::::::::::::::::::::::::::::
- REM Run shell as admin (example) - put here code as you like
 
 IF NOT EXIST %temp%\POST_TEMP\ (cd /D ./IndividualScripts/) else ( cd /D %temp%/POST_TEMP/)
 set ps=powershell.exe -NoProfile -ExecutionPolicy Unrestricted -Command "
@@ -102,7 +49,7 @@ cls
 
 cls
 echo ----------------------------------------------------------------
-echo                      Choose Options [Extras]                    
+echo                      Choose Options [Extras Page(1)]                    
 echo ----------------------------------------------------------------
 echo.
 echo  [1]. Standalone Winget Install
@@ -112,6 +59,7 @@ echo  [4]. Enable/Disable UAC Verification
 echo  [5]. Backup Firefox Settings
 echo  [6]. Create Shortcut for this script (Desktop)
 echo  [7]. Download This Script Locally
+echo  [8]. Next Page
 echo  [9]. Go Back
 echo  [0]. Exit
 echo.
@@ -119,13 +67,14 @@ echo.
 set op=%~1
 
 if "%op%"=="" ( 
-    set /P op=Enter choice on your keyboard [1,2,3,4,5,6,7,9,0]: 
+    set /P op=Enter choice on your keyboard [1,2,3,4,5,6,7,8,9,0]: 
 ) else (
     shift
 )
 
 if %op%==0 goto end
 if %op%==9 goto start
+if %op%==8 goto misc2
 if %op%==7 goto dw_script
 if %op%==6 goto shortcutmaker
 if %op%==5 goto ff
@@ -136,6 +85,38 @@ if %op%==1 goto wg
 
 goto misc
 ::======================================================================================
+
+::======================================================================================
+:misc2
+cls
+
+cls
+echo ----------------------------------------------------------------
+echo                      Choose Options [Extras Page(2)]                    
+echo ----------------------------------------------------------------
+echo.
+echo  [1]. Install APKs
+echo  [8]. Next Page
+echo  [9]. Go Back
+echo  [0]. Exit
+echo.
+
+set op=%~1
+
+if "%op%"=="" ( 
+    set /P op=Enter choice on your keyboard [1,8,9,0]: 
+) else (
+    shift
+)
+
+if %op%==0 goto end
+if %op%==9 goto start
+if %op%==8 goto misc2
+if %op%==1 goto install_apks
+
+goto misc2
+::======================================================================================
+
 
 ::======================================================================================
 :mass
@@ -149,6 +130,13 @@ goto start
 ::======================================================================================
 :ctt
 cls
+:: Check if script is running in admin mode
+net session >nul 2>&1
+if %errorlevel% neq 0 (
+    echo Please rerun the script as an administrator.
+    pause
+    goto start
+)
 set ps=powershell.exe -NoProfile -ExecutionPolicy Unrestricted -Command "
 title ChrisTitusTech Programs Installer (FROM INDIVIDUAL FOLDER)
 %ps%irm https://raw.githubusercontent.com/8mpty/winutil/main/winutil.ps1 | iex"
@@ -1178,6 +1166,13 @@ goto start
 ::======================================================================================
 :uac_verification
 cls
+:: Check if script is running in admin mode
+net session >nul 2>&1
+if %errorlevel% neq 0 (
+    echo Please rerun the script as an administrator.
+    pause
+    goto start
+)
 echo ----------------------------------------------------------------
 echo                         Enable Admin UAC                       
 echo ----------------------------------------------------------------
@@ -1467,6 +1462,77 @@ if "%op%"=="" (
 )
 goto start
 ::======================================================================================
+
+
+::======================================================================================
+:install_apks
+cls
+:: Check if ADB is in the system path
+adb version > nul 2>&1
+if %errorlevel% neq 0 (
+    echo ADB not found in the system path. Make sure ADB is installed and added to the path.
+    pause
+    exit /b
+)
+
+:: Check if files were dragged onto the batch file
+if "%~1" == "" (
+    goto OPENED
+) else (
+    for %%A in (%*) do (
+        set "apkname=%%~nxA"  :: Extract only the filename
+        set "file=%%~A" :: Extract package name
+        set "ext=!file:~-4!" :: Extract extension
+
+        :: Check if the file has a .apk extension
+        if /i !ext! == .apk (
+            echo.
+            echo Installing !apkname!
+            adb install -r "!file!"
+        )
+    )
+    goto apk_finish
+)
+
+
+:OPENED
+cls
+echo For dragging APKs to work, script must NOT be running in Admin mode
+echo If in admin mode, user will have the manually copy the path of the APK/s with spacing after each apk
+echo. 
+set /p "files=Drag APK files here and press Enter: "
+if "%files%" == "" (
+    echo No files were dragged. Exiting...
+    pause
+    exit /b
+) else (
+    set "files=%files:"=%"
+    set "files=%files% "  REM Append a space at the end
+    goto LOOPOPENED
+)
+
+:LOOPOPENED
+:: Loop through the dragged files
+for %%A in (%files%) do (
+    set "apkname=%%~nxA"  :: Extract only the filename
+    set "file=%%~A" :: Extract package name
+    set "ext=!file:~-4!" :: Extract extension
+
+    :: Check if the file has a .apk extension
+    if /i !ext! == .apk (
+        echo.
+        echo Installing !apkname!
+        adb install -r "!file!"
+    )
+)
+
+
+:apk_finish
+echo.
+echo ALL INSTALLATION FINISHED
+pause
+::======================================================================================
+
 
 ::======================================================================================
 :end
