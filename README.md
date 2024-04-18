@@ -23,11 +23,11 @@ Option 2: Using the Powershell/Terminal commands below ☟
 <p>
 
 ```
-irm post.8mpty.xyz | iex
+irm 8mpty.com/post | iex
 ```
 or (A bit more Secure)
 ```
-irm https://post.8mpty.xyz | iex
+irm https://8mpty.com/post | iex
 ```
 or (use if DNS issues)
 ```
