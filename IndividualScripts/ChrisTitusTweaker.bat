@@ -60,4 +60,4 @@ CLS
 cls
 set ps=powershell.exe -NoProfile -ExecutionPolicy Unrestricted -Command "
 title ChrisTitusTech Programs Installer (FROM INDIVIDUAL FOLDER)
-%ps%irm https://raw.githubusercontent.com/8mpty/winutil/main/winutil.ps1 | iex"
+%ps%irm https://raw.githubusercontent.com/8mpty/winutil/main/windev.ps1 | iex"
