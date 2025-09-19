@@ -56,7 +56,7 @@ CLS
  ::::::::::::::::::::::::::::
  REM Run shell as admin (example) - put here code as you like
 
-:start
+:ChrisTitusTweaker
 cls
 set ps=powershell.exe -NoProfile -ExecutionPolicy Unrestricted -Command "
 title ChrisTitusTech Programs Installer (FROM INDIVIDUAL FOLDER)
