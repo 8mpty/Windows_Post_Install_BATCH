@@ -56,7 +56,7 @@ CLS
  ::::::::::::::::::::::::::::
  REM Run shell as admin (example) - put here code as you like
 
-:start
+:DownloadScript
 cls
 echo ----------------------------------------------------------------
 echo                         Download Options                          

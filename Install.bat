@@ -123,7 +123,7 @@ goto misc2
 cls
 set ps=powershell.exe -NoProfile -ExecutionPolicy Unrestricted -Command "
 title Activate Windows 10 (FROM INDIVIDUAL FOLDER)
-%ps%irm https://raw.githubusercontent.com/8mpty/MAS/master/link.ps1 | iex"
+%ps%irm https://get.activated.win | iex"
 goto start
 ::======================================================================================
 
